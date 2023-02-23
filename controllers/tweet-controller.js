@@ -1,46 +1,33 @@
-import { usuarios } from "./user-controller.js";
-const tweets = [];
+import tweetService from "../services/tweet-service.js";
 
-export async function postTweet(req, res) {
+export function postTweet(req, res) {
   const { tweet, username } = req.body;
 
-  if (!username || !tweet) {
-    return res.status(400).send("Todos os campos são obrigatórios!");
+  try {
+    tweetService.postTweet(tweet, username);
+    res.status(201).send("OK, seu tweet foi criado");
+  } catch (error) {
+    res.status(401).send(error);
   }
-
-  const { avatar } = usuarios.find((user) => user.username === username);
-
-  tweets.push({ username, tweet, avatar });
-
-  res.status(201).send("OK, seu tweet foi criado");
 }
 
-export async function getTweets(req, res) {
+export function getTweets(req, res) {
   const { page } = req.query;
-
-  if (page && page < 1) {
-    res.status(400).send("Informe uma página válida!");
-    return;
+  try {
+    const result = tweetService.getTweets(page);
+    res.status(200).send(result);
+  } catch (error) {
+    res.status(401).send(error);
   }
-  const limite = 10;
-  const start = (page - 1) * limite;
-  const end = page * limite;
-
-  if (tweets.length <= 10) {
-    return res.send(reverseTweets());
-  }
-
-  res.status(200).send([...tweets].reverse().slice(start, end));
 }
 
-function reverseTweets() {
-  return [...tweets].reverse();
-}
-
-export async function getTweetsByUser(req, res) {
+export function getTweetsByUser(req, res) {
   const { username } = req.params;
 
-  const tweetsDoUsuario = tweets.filter((t) => t.username === username);
-
-  res.status(200).send(tweetsDoUsuario);
+  try {
+    const result = tweetService.getTweetsByUser(username);
+    res.status(200).send(result);
+  } catch (error) {
+    res.status(401).send(error);
+  }
 }
