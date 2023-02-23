@@ -1,6 +1,14 @@
 import userService from "./user-service.js";
 const tweets = [];
 
+class Tweet {
+  constructor({ text, user, avatar }) {
+    this.text = text;
+    this.user = user;
+    this.avatar = avatar;
+  }
+}
+
 export function postTweet(tweet, username) {
   if (!username || !tweet) {
     throw "Todos os campos são obrigatórios!";
@@ -10,7 +18,13 @@ export function postTweet(tweet, username) {
     (user) => user.username === username
   );
 
-  tweets.push({ username, tweet, avatar });
+  const userTweet = new Tweet({
+    text: tweet,
+    user: username,
+    avatar: avatar,
+  });
+
+  tweets.push(userTweet);
 }
 
 export function getTweets(page) {
